@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../supabaseClient.js';
 import './SubmitBook.css';
@@ -11,9 +11,35 @@ export default function SubmitBook() {
     price: '',
     condition: '',
     description: '',
+    category_id: '',
+    seller_id: '',
   });
+  const [categories, setCategories] = useState([]);
+  const [sellers, setSellers] = useState([]);
   const [message, setMessage] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // 加载分类和卖家列表
+  useEffect(() => {
+    const fetchData = async () => {
+      // 查询 categories 表
+      const { data: categoriesData } = await supabase
+        .from('categories')
+        .select('id, name')
+        .order('name');
+      
+      // 查询 sellers 表
+      const { data: sellersData } = await supabase
+        .from('sellers')
+        .select('id, name')
+        .order('name');
+
+      if (categoriesData) setCategories(categoriesData);
+      if (sellersData) setSellers(sellersData);
+    };
+
+    fetchData();
+  }, []);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -30,9 +56,8 @@ export default function SubmitBook() {
       price: Number(form.price),
       condition: form.condition,
       description: form.description || null,
-      // 这里先写死一个分类和卖家（请把 1 换成你实际表里的某个 id）
-      category_id: 1,
-      seller_id: 1,
+      category_id: Number(form.category_id),
+      seller_id: Number(form.seller_id),
     });
 
     if (error) {
@@ -41,7 +66,7 @@ export default function SubmitBook() {
       setIsSubmitting(false);
     } else {
       setMessage('发布成功！');
-      setForm({ title: '', author: '', price: '', condition: '', description: '' });
+      setForm({ title: '', author: '', price: '', condition: '', description: '', category_id: '', seller_id: '' });
       setIsSubmitting(false);
       setTimeout(() => {
         navigate('/');
@@ -110,6 +135,46 @@ export default function SubmitBook() {
                 <option value="八成新">八成新</option>
                 <option value="七成新">七成新</option>
                 <option value="六成新及以下">六成新及以下</option>
+              </select>
+            </div>
+          </div>
+
+          <div className="form-row">
+            <div className="form-group">
+              <label htmlFor="category_id">分类 *</label>
+              <select
+                id="category_id"
+                name="category_id"
+                value={form.category_id}
+                onChange={handleChange}
+                required
+                className="form-select"
+              >
+                <option value="">请选择分类</option>
+                {categories.map((cat) => (
+                  <option key={cat.id} value={cat.id}>
+                    {cat.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="seller_id">卖家 *</label>
+              <select
+                id="seller_id"
+                name="seller_id"
+                value={form.seller_id}
+                onChange={handleChange}
+                required
+                className="form-select"
+              >
+                <option value="">请选择卖家</option>
+                {sellers.map((seller) => (
+                  <option key={seller.id} value={seller.id}>
+                    {seller.name}
+                  </option>
+                ))}
               </select>
             </div>
           </div>

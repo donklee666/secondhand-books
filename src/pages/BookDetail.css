@@ -90,6 +90,27 @@
   font-style: italic;
 }
 
+.book-category {
+  font-size: 1.1rem;
+  color: #2563eb;
+  font-weight: 500;
+  background-color: #eff6ff;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  display: inline-block;
+}
+
+.book-seller {
+  font-size: 1.1rem;
+  color: #374151;
+  margin-bottom: 0.5rem;
+}
+
+.book-contact {
+  font-size: 0.95rem;
+  color: #6b7280;
+}
+
 .book-actions {
   padding-top: 2rem;
   border-top: 1px solid #e5e7eb;

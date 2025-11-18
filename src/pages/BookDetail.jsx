@@ -10,9 +10,14 @@ export default function BookDetail() {
 
   useEffect(() => {
     const fetchBook = async () => {
+      // 使用 JOIN 查询关联 categories 和 sellers 表
       const { data, error } = await supabase
         .from('books')
-        .select('*')
+        .select(`
+          *,
+          categories:category_id (id, name),
+          sellers:seller_id (id, name, contact)
+        `)
         .eq('id', id)
         .single();
       if (error) {
@@ -62,6 +67,23 @@ export default function BookDetail() {
             <h3>价格</h3>
             <p className="book-price-large">¥{book.price}</p>
           </div>
+
+          {book.categories && (
+            <div className="info-section">
+              <h3>分类</h3>
+              <p className="book-category">{book.categories.name || '未分类'}</p>
+            </div>
+          )}
+
+          {book.sellers && (
+            <div className="info-section">
+              <h3>卖家信息</h3>
+              <p className="book-seller">卖家：{book.sellers.name || '未知'}</p>
+              {book.sellers.contact && (
+                <p className="book-contact">联系方式：{book.sellers.contact}</p>
+              )}
+            </div>
+          )}
 
           {book.description && (
             <div className="info-section">
